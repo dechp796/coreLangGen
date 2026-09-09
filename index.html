@@ -1,0 +1,19 @@
+<script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { verifyAdminPIN, checkAdminStatus } from "./auth-service.js";
+
+    // Auto Login แบบ Anonymous ให้ผู้ใช้ทั่วไป
+    signInAnonymously(auth).catch((err) => console.error("Auth Error:", err));
+
+    // ผูกฟังก์ชันเข้ากับปุ่มบน UI
+    window.handleUnlock = async function() {
+        const pin = prompt("กรอก Admin PIN:");
+        const success = await verifyAdminPIN(pin);
+        if (success) {
+            alert("🔓 ปลดล็อคสิทธิ์ Admin เรียบร้อยแล้ว");
+        } else {
+            alert("❌ PIN ไม่ถูกต้อง");
+        }
+    };
+</script>
