@@ -78,8 +78,8 @@ button:hover { background: #d9d9d9; }
 <div id="loginOverlay">
     <div class="login-box">
         <h3>🔒 เข้าสู่ระบบใช้งาน</h3>
-        <input type="text" id="authUser" placeholder="Username">
-        <input type="password" id="authPass" placeholder="Password">
+        <input type="text" id="authUser" placeholder="Username" onkeyup="if(event.key==='Enter') checkAuth()">
+        <input type="password" id="authPass" placeholder="Password" onkeyup="if(event.key==='Enter') checkAuth()">
         <button onclick="checkAuth()">ปลดล็อคเข้าใช้งาน</button>
     </div>
 </div>
@@ -156,8 +156,7 @@ button:hover { background: #d9d9d9; }
 <script>
 var _0x21a4=['\x61\x75\x74\x68\x55\x73\x65\x72','\x61\x75\x74\x68\x50\x61\x73\x73','\x76\x61\x6c\x75\x65','\x61\x64\x6d\x69\x6e','\x64\x65\x4e\x69\x73\x35\x36','\x6c\x6f\x67\x69\x6e\x4f\x76\x65\x72\x6c\x61\x79','\x73\x74\x79\x6c\x65','\x64\x69\x73\x70\x6c\x61\x79','\x6e\x6f\x6e\x65','\x61\x70\x70\x43\x6f\x6e\x74\x61\x69\x6e\x65\x72','\x66\x69\x6c\x74\x65\x72','\x70\x6f\x69\x6e\x74\x65\x72\x45\x76\x65\x6e\x74\x73','\x61\x75\x74\x6f'];function checkAuth(){const _0x1=document['getElementById']('authUser')['value'];const _0x2=document['getElementById']('authPass')['value'];if(_0x1==='admin'&&_0x2==='deNis56'){document['getElementById']('loginOverlay')['style']['display']='none';const _0x3=document['getElementById']('appContainer');_0x3['style']['filter']='none';_0x3['style']['pointerEvents']='auto';}else{alert('❌ Username หรือ Password ไม่ถูกต้อง!');}}
 </script>
-
-<!-- APPLICATION LOGIC CODE -->
+<!-- APPLICATION LOGIC CODE (COMPLETE HISTORY & UI FIX) -->
 <script>
 let globalCdnMap = new Map();
 const MAX_CDN_HISTORY = 5;
@@ -342,7 +341,7 @@ function generateTable() {
 let draggedRow = null;
 function setupMainRowDragAndDrop(tr) {
     const handle = tr.querySelector('.drag-handle');
-    handle.addEventListener('mousedown', () => tr.draggable = true);
+    if (handle) handle.addEventListener('mousedown', () => tr.draggable = true);
     tr.addEventListener('dragstart', function() { draggedRow = this; setTimeout(() => this.classList.add('dragging'), 0); });
     tr.addEventListener('dragend', function() { this.classList.remove('dragging'); draggedRow = null; saveCurrentTableToHistory(); });
     tr.addEventListener('dragover', function(e) { e.preventDefault(); });
@@ -360,12 +359,29 @@ function setupMainRowDragAndDrop(tr) {
 
 function deleteRow(button) { button.closest('tr').remove(); saveCurrentTableToHistory(); }
 
+function getThaiTimestamp() {
+    const now = new Date();
+    return `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+}
+
 function saveCurrentTableToHistory() {
     const rows = Array.from(document.querySelectorAll("#output tbody tr"));
     if (rows.length === 0) return;
-    const rowsHtml = rows.map(tr => `<tr>${Array.from(tr.querySelectorAll("td:not(.action-col)")).map(td => `<td style="border:1px solid #000;padding:2px 3px;">${td.textContent}</td>`).join("")}</tr>`).join("");
+    
+    const rowsHtml = rows.map(tr => {
+        const tds = Array.from(tr.querySelectorAll("td:not(.action-col)")).map(td => `<td style="border:1px solid #000;padding:2px 3px;vertical-align:top;white-space:pre-wrap;">${td.textContent}</td>`).join("");
+        return `<tr>${tds}</tr>`;
+    }).join("");
+
     let history = JSON.parse(localStorage.getItem('table_history') || '[]');
-    history.unshift({ timestamp: new Date().toLocaleString(), rowsHtml });
+    const newItem = {
+        timestamp: getThaiTimestamp(),
+        thaiInput: document.getElementById("thaiInput").value,
+        engInput: document.getElementById("engInput").value,
+        rowsHtml: rowsHtml
+    };
+
+    history.unshift(newItem);
     if (history.length > 10) history.pop();
     localStorage.setItem('table_history', JSON.stringify(history));
     renderRecentHistory();
@@ -374,31 +390,159 @@ function saveCurrentTableToHistory() {
 function renderRecentHistory() {
     const container = document.getElementById('recentContainer');
     const history = JSON.parse(localStorage.getItem('table_history') || '[]');
-    if (history.length === 0) { container.innerHTML = '<div style="color: #666; font-size: 12px;">ยังไม่มีประวัติการสร้าง</div>'; return; }
-    container.innerHTML = history.map((item, index) => `<div class="recent-item"><div class="recent-header"><span>🕒 <strong>${item.timestamp}</strong></span><div><button onclick="restoreFromHistory(${index}, true)">📥 ดึงมาแทนที่</button></div></div></div>`).join('');
+    
+    if (history.length === 0) {
+        container.innerHTML = '<div style="color: #666; font-size: 12px;">ยังไม่มีประวัติการสร้าง</div>';
+        return;
+    }
+
+    container.innerHTML = history.map((item, index) => `
+        <div class="recent-item">
+            <div class="recent-header">
+                <span>🕒 <strong>${item.timestamp}</strong></span>
+                <div>
+                    <button id="toggle-btn-${index}" onclick="toggleTable(${index})">แสดงตาราง</button>
+                    <button onclick="restoreFromHistory(${index}, false)" style="background: #e2f0d9;" title="เอาข้อมูลประวัติไปต่อท้ายตารางหลักเดิม">➕ ดึงมาต่อท้าย</button>
+                    <button onclick="restoreFromHistory(${index}, true)" style="background: #d9edf7;" title="ล้างตารางเดิม แล้วเอาประวัตินี้มาวางแทนทั้งหมด">📥 ดึงมาทั้งหมด (แทนที่)</button>
+                    <button onclick="copyRecentTable(${index})">Copy ตารางนี้</button>
+                </div>
+            </div>
+            <div id="table-container-${index}" class="recent-table-wrapper">
+                <table class="recent-table" id="recent-table-${index}">
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid #000000; background-color: #A9D18E; width: 24.5%;">KEY</th>
+                            <th style="border: 1px solid #000000; background-color: #A9D18E; width: 31.5%;">ENG</th>
+                            <th style="border: 1px solid #000000; background-color: #A9D18E; width: 44%;">THAI</th>
+                        </tr>
+                    </thead>
+                    <tbody>${item.rowsHtml}</tbody>
+                </table>
+            </div>
+        </div>
+    `).join('');
 }
 
-function restoreFromHistory(index, isReplace) {
+function restoreFromHistory(index, isReplace = false) {
     const history = JSON.parse(localStorage.getItem('table_history') || '[]');
-    const selected = history[index];
-    if (!selected) return;
-    if (isReplace) document.querySelector("#output tbody").innerHTML = "";
-    const temp = document.createElement('div');
-    temp.innerHTML = `<table>${selected.rowsHtml}</table>`;
-    temp.querySelectorAll('tr').forEach(tr => {
+    const selectedItem = history[index];
+    if (!selectedItem) return;
+
+    if (isReplace) {
+        document.querySelector("#output tbody").innerHTML = "";
+    }
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = `<table><tbody>${selectedItem.rowsHtml}</tbody></table>`;
+    
+    const rows = tempDiv.querySelectorAll('tr');
+    let addedCount = 0;
+
+    rows.forEach(tr => {
         const tds = tr.querySelectorAll('td');
-        if (tds.length >= 3) appendRowToMainTable(tds[0].textContent, tds[1].textContent, tds[2].textContent);
+        if (tds.length >= 3) {
+            const key = tds[0].textContent.trim();
+            const eng = tds[1].textContent;
+            const thai = tds[2].textContent;
+            
+            if (key) {
+                appendRowToMainTable(key, eng, thai);
+                addedCount++;
+            }
+        }
     });
+
+    if (selectedItem.thaiInput) document.getElementById("thaiInput").value = selectedItem.thaiInput;
+    if (selectedItem.engInput) document.getElementById("engInput").value = selectedItem.engInput;
+
+    const actionText = isReplace ? "แทนที่ตารางเดิมทั้งหมด" : "ต่อท้ายตารางหลัก";
+    alert(`📥 ดึงข้อมูลประวัติ (${actionText}) เรียบร้อย! นำเข้า ${addedCount} รายการครับ`);
+}
+
+function toggleTable(index) {
+    const wrapper = document.getElementById(`table-container-${index}`);
+    const btn = document.getElementById(`toggle-btn-${index}`);
+    if (wrapper.style.display === "block") {
+        wrapper.style.display = "none";
+        btn.textContent = "แสดงตาราง";
+    } else {
+        wrapper.style.display = "block";
+        btn.textContent = "ซ่อนตาราง";
+    }
+}
+
+async function copyRecentTable(index) {
+    const table = document.getElementById(`recent-table-${index}`);
+    if (!table) return;
+
+    const rowsHtml = Array.from(table.querySelectorAll("tbody tr")).map(tr => {
+        const tds = Array.from(tr.querySelectorAll("td")).map(td => {
+            const tempTd = document.createElement("td");
+            tempTd.style.cssText = "border: 1px solid #000000; padding: 2px 3px; vertical-align: top; white-space: pre-wrap;";
+            tempTd.textContent = td.textContent;
+            return tempTd.outerHTML;
+        }).join("");
+        return `<tr>${tds}</tr>`;
+    }).join("");
+
+    const styledHtml = `<table style="border-collapse: collapse; font-family: Arial, sans-serif; font-size: 13px;"><thead><tr><th style="background-color: #A9D18E; border: 1px solid #000000; text-align: center; vertical-align: middle; font-weight: normal; height: 25px; padding: 1px 3px; width: 24.5%;">KEY</th><th style="background-color: #A9D18E; border: 1px solid #000000; text-align: center; vertical-align: middle; font-weight: normal; height: 25px; padding: 1px 3px; width: 31.5%;">ENG</th><th style="background-color: #A9D18E; border: 1px solid #000000; text-align: center; vertical-align: middle; font-weight: normal; height: 25px; padding: 1px 3px; width: 44%;">THAI</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = `<table><tbody>${rowsHtml}</tbody></table>`;
+    const plainText = Array.from(tempDiv.querySelectorAll("tr")).map(tr => Array.from(tr.querySelectorAll("td")).map(td => td.innerText).join("\t")).join("\n");
+
+    try {
+        await navigator.clipboard.write([new ClipboardItem({ "text/html": new Blob([styledHtml], { type: "text/html" }), "text/plain": new Blob([plainText], { type: "text/plain" }) })]);
+        alert("Copied Recent Table!");
+    } catch (err) {
+        alert("Copy failed!");
+    }
+}
+
+async function copyTable() {
+    const table = document.getElementById("output");
+    const rowsHtml = Array.from(table.querySelectorAll("tbody tr")).map(tr => {
+        const tds = Array.from(tr.querySelectorAll("td:not(.action-col)")).map(td => {
+            const tempTd = document.createElement("td");
+            tempTd.style.cssText = "border: 1px solid #000000; padding: 2px 3px; vertical-align: top; white-space: pre-wrap;";
+            tempTd.textContent = td.textContent;
+            return tempTd.outerHTML;
+        }).join("");
+        return `<tr>${tds}</tr>`;
+    }).join("");
+
+    const styledHtml = `<table style="border-collapse: collapse; font-family: Arial, sans-serif; font-size: 13px;"><thead><tr><th style="background-color: #A9D18E; border: 1px solid #000000; text-align: center; vertical-align: middle; font-weight: normal; height: 25px; padding: 1px 3px; width: 24.5%;">KEY</th><th style="background-color: #A9D18E; border: 1px solid #000000; text-align: center; vertical-align: middle; font-weight: normal; height: 25px; padding: 1px 3px; width: 31.5%;">ENG</th><th style="background-color: #A9D18E; border: 1px solid #000000; text-align: center; vertical-align: middle; font-weight: normal; height: 25px; padding: 1px 3px; width: 44%;">THAI</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = `<table><tbody>${rowsHtml}</tbody></table>`;
+    const plainText = Array.from(tempDiv.querySelectorAll("tr")).map(tr => Array.from(tr.querySelectorAll("td")).map(td => td.innerText).join("\t")).join("\n");
+
+    try {
+        await navigator.clipboard.write([new ClipboardItem({ "text/html": new Blob([styledHtml], { type: "text/html" }), "text/plain": new Blob([plainText], { type: "text/plain" }) })]);
+        const status = document.getElementById("copyStatus");
+        if (status) { status.textContent = "Copied with Format!"; setTimeout(() => status.textContent = "", 1500); }
+    } catch (err) {
+        alert("Copy failed!");
+    }
 }
 
 function clearAll() {
     document.getElementById("thaiInput").value = "";
     document.getElementById("engInput").value = "";
+    
+    const searchInput = document.getElementById("searchInput");
+    searchInput.value = "";
+    searchInput.disabled = true;
+    searchInput.placeholder = "กรุณากด Fetch CDN หรือ Upload ไฟล์ JSON ก่อนเพื่อค้นหา...";
+    
+    globalCdnMap.clear();
     document.querySelector("#output tbody").innerHTML = "";
+    const status = document.getElementById("copyStatus");
+    if (status) status.textContent = "";
 }
 
 function clearHistory() {
-    if (confirm("ล้างประวัติทั้งหมด?")) {
+    if (confirm("ต้องการล้างประวัติทั้งหมดใช่หรือไม่?")) {
         localStorage.removeItem('table_history');
         renderRecentHistory();
     }
@@ -408,6 +552,8 @@ window.onload = function() {
     renderCdnHistory();
     renderRecentHistory();
 };
+
+
 </script>
 </body>
 </html>
