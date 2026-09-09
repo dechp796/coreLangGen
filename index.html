@@ -1,19 +1,252 @@
-<script type="module">
-    import { auth, db } from "./firebase-config.js";
-    import { signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { verifyAdminPIN, checkAdminStatus } from "./auth-service.js";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoreLang Generator By QA.deNis56</title>
 
-    // Auto Login แบบ Anonymous ให้ผู้ใช้ทั่วไป
-    signInAnonymously(auth).catch((err) => console.error("Auth Error:", err));
+    <!-- 1. PROTECTED KILL SWITCH & DOMAIN LOCK (STEP 1) -->
+    <script>
+    var _0x2a1f=['\x6c\x6f\x63\x61\x74\x69\x6f\x6e','\x70\x72\x6f\x74\x6f\x63\x6f\x6c','\x66\x69\x6c\x65\x3a','\x68\x6f\x73\x74\x6e\x61\x6d\x65','\x64\x65\x63\x68\x70\x37\x39\x36\x2e\x67\x69\x74\x68\x75\x62\x2e\x69\x6f','\x6f\x6e\x4c\x69\x6e\x65'];(function(_0x11b333,_0x2a1f89){var _0x511f93=function(_0x5c7b39){while(--_0x5c7b39){_0x11b333['push'](_0x11b333['shift']());}};_0x511f93(++_0x2a1f89);}(_0x2a1f,0x1b4));var _0x511f=function(_0x11b333,_0x2a1f89){_0x11b333=_0x11b333-0x0;var _0x511f93=_0x2a1f[_0x11b333];return _0x511f93;};(function(){if(window[_0x511f('0x0')][_0x511f('0x1')]===_0x511f('0x2')){document['write']('<div\x20style=\x22background:#1a1a1a;color:#ff4d4d;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:sans-serif;\x22><h1\x20style=\x22font-size:32px;\x22>❌\x20Access\x20Denied\x20(Offline\x20Blocked)</h1><p>ไม่อนุญาตให้เปิดใช้งานจากไฟล์ในเครื่อง\x20(file://)</p></div>');window['stop']();throw new Error('Blocked');}if(window[_0x511f('0x0')][_0x511f('0x3')]!==_0x511f('0x4')){document['write']('<div\x20style=\x22background:#1a1a1a;color:#ff4d4d;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:sans-serif;\x22><h1\x20style=\x22font-size:32px;\x22>❌\x20Unauthorized\x20Domain</h1></div>');window['stop']();throw new Error('Blocked');}if(!navigator[_0x511f('0x5')]){document['write']('<div\x20style=\x22background:#1a1a1a;color:#ffcc00;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:sans-serif;\x22><h1>⚠️\x20Connection\x20Required</h1></div>');window['stop']();throw new Error('Offline');}window['addEventListener']('offline',function(){document['body']['innerHTML']='<div\x20style=\x22background:#1a1a1a;color:#ffcc00;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:sans-serif;\x22><h1>⚠️\x20Connection\x20Lost</h1></div>';});})();
+    </script>
 
-    // ผูกฟังก์ชันเข้ากับปุ่มบน UI
-    window.handleUnlock = async function() {
-        const pin = prompt("กรอก Admin PIN:");
-        const success = await verifyAdminPIN(pin);
-        if (success) {
-            alert("🔓 ปลดล็อคสิทธิ์ Admin เรียบร้อยแล้ว");
-        } else {
-            alert("❌ PIN ไม่ถูกต้อง");
+    <!-- 2. FIREBASE AUTH MODULE & SERVER GUARD (STEP 2) -->
+    <script type="module">
+        import { auth } from "./firebase-config.js";
+        import { signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { verifyAdminPIN, checkAdminStatus } from "./auth-service.js";
+
+        window.isServerVerified = false;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const token = await user.getIdToken();
+                if (token) {
+                    window.isServerVerified = true;
+                }
+            } else {
+                window.isServerVerified = false;
+            }
+        });
+
+        signInAnonymously(auth).catch(() => {
+            window.isServerVerified = false;
+        });
+
+        const btnUnlock = document.getElementById("btnUnlock");
+        const lockStatus = document.getElementById("lockStatus");
+        const btnClearHistory = document.getElementById("btnClearHistory");
+
+        btnUnlock.addEventListener("click", async () => {
+            const inputPin = prompt("กรอก Admin PIN เพื่อปลดล็อคสิทธิ์:");
+            if (!inputPin) return;
+
+            btnUnlock.textContent = "⏳ ตรวจสอบ...";
+            const isSuccess = await verifyAdminPIN(inputPin);
+
+            if (isSuccess) {
+                lockStatus.textContent = "🔓 สถานะ: UNLOCKED (สิทธิ์ Admin)";
+                lockStatus.className = "status-unlocked";
+                btnUnlock.style.display = "none";
+                btnClearHistory.style.display = "inline-block";
+                alert("✅ ปลดล็อคสิทธิ์ Admin เรียบร้อยแล้ว!");
+            } else {
+                alert("❌ PIN ไม่ถูกต้อง!");
+                btnUnlock.textContent = "🔓 ปลดล็อค Admin (PIN)";
+            }
+        });
+
+        window.checkAdminStatus = checkAdminStatus;
+    </script>
+
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border-color: #334155;
+            --accent-color: #38bdf8;
+            --accent-hover: #0284c7;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-    };
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .header h1 { margin: 0; font-size: 24px; color: var(--accent-color); }
+        .auth-bar { display: flex; align-items: center; gap: 15px; }
+        .status-locked { color: var(--danger-color); font-weight: bold; }
+        .status-unlocked { color: var(--success-color); font-weight: bold; }
+
+        button {
+            background-color: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: var(--accent-hover); color: #fff; }
+
+        .search-section { position: relative; width: 100%; }
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0 0 6px 6px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .search-item { padding: 10px; border-bottom: 1px solid var(--border-color); cursor: pointer; }
+        .search-item:hover { background-color: var(--border-color); }
+        .search-item .item-key { color: var(--accent-color); font-weight: bold; }
+        .search-item .item-val { color: var(--text-sub); font-size: 12px; }
+
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        textarea {
+            width: 100%;
+            height: 180px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 6px;
+            padding: 10px;
+            box-sizing: border-box;
+            font-family: monospace;
+            resize: vertical;
+        }
+
+        .action-bar { display: flex; justify-content: flex-end; gap: 10px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { background-color: rgba(255, 255, 255, 0.05); color: var(--accent-color); }
+
+        input[type="text"] {
+            width: 100%;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-main);
+            padding: 6px;
+            border-radius: 4px;
+        }
+        input[type="text"]:focus { background: var(--bg-color); border-color: var(--accent-color); outline: none; }
+
+        .btn-danger { background-color: var(--danger-color); color: #fff; }
+        .btn-danger:hover { background-color: #dc2626; }
+        .btn-success { background-color: var(--success-color); color: #fff; }
+        .btn-success:hover { background-color: #059669; }
+
+        .footer-info { text-align: center; color: var(--text-sub); font-size: 12px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>CoreLang Generator V5</h1>
+        <div class="auth-bar">
+            <span id="lockStatus" class="status-locked">🔒 สถานะ: LOCKED</span>
+            <button id="btnUnlock">🔓 ปลดล็อค Admin (PIN)</button>
+        </div>
+    </div>
+
+    <div class="search-section">
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 ค้นหา KEY หรือข้อความจาก CDN (พิมพ์เพื่อค้นหา)..." oninput="handleSearch()">
+        <div id="searchResults" class="search-results"></div>
+    </div>
+
+    <div class="input-grid">
+        <div>
+            <label style="display:block;margin-bottom:5px;color:var(--accent-color);">🇬🇧 ข้อมูลภาษาอังกฤษ (ENG)</label>
+            <textarea id="engInput" placeholder="วางข้อมูลภาษาอังกฤษที่นี่..."></textarea>
+        </div>
+        <div>
+            <label style="display:block;margin-bottom:5px;color:var(--accent-color);">🇹🇭 ข้อมูลภาษาไทย (THAI)</label>
+            <textarea id="thaiInput" placeholder="วางข้อมูลภาษาไทยที่นี่..."></textarea>
+        </div>
+    </div>
+
+    <div class="action-bar">
+        <button id="btnClearHistory" class="btn-danger" style="display: none;" onclick="clearHistory()">🗑️ ล้างประวัติทั้งหมด</button>
+        <button onclick="generateTable()">⚡ Generate ตาราง</button>
+        <button class="btn-success" onclick="copyResult()">📋 Copy ผลลัพธ์</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 30%;">KEY</th>
+                <th style="width: 30%;">ENGLISH</th>
+                <th style="width: 30%;">THAI</th>
+                <th style="width: 10%; text-align: center;">จัดการ</th>
+            </tr>
+        </thead>
+        <tbody id="mainTbody">
+            <!-- Dynamic Content -->
+        </tbody>
+    </table>
+
+    <div class="footer-info">
+        Developed By QA.deNis56 | Anti-Offline Protected System
+    </div>
+</div>
+
+<!-- 3. PROTECTED CORE LOGIC & FUNCTION (STEP 2 + STEP 3 OBFUSCATED) -->
+<script>
+var _0x3e12=['\x67\x6c\x6f\x62\x61\x6c\x43\x64\x6e\x4d\x61\x70','\x69\x73\x53\x65\x72\x76\x65\x72\x56\x65\x72\x69\x66\x69\x65\x64','\x6f\x6e\x4c\x69\x6e\x65','\x74\x68\x61\x69\x49\x6e\x70\x75\x74','\x65\x6e\x67\x49\x6e\x70\x75\x74','\x6d\x61\x69\x6e\x54\x62\x6f\x64\x79'];let globalCdnMap=new Map();window['addEventListener']('DOMContentLoaded',()=>{loadCdnCache();});async function loadCdnCache(){try{const _0x1a2b=await fetch('http://127.0.0.1:8080/fetch-cdn');if(_0x1a2b['ok']){const _0x3c4d=await _0x1a2b['json']();if(_0x3c4d&&_0x3c4d['en']){for(const[_0x5e6f,_0x7a8b]of Object['entries'](_0x3c4d['en'])){globalCdnMap['set'](_0x5e6f,{'key':_0x5e6f,'eng':_0x7a8b,'thai':_0x3c4d['th']?.[_0x5e6f]||''});}}}}catch(_0x9c0d){}}function isThaiText(_0x1122){return/[\u0e00-\u0e7f]/['test'](_0x1122);}function parseData(_0x3344){if(!_0x3344)return[];const _0x5566=_0x3344['split']('\n');const _0x7788=[];_0x5566['forEach'](_0x99aa=>{const _0xbbcc=_0x99aa['trim']();if(!_0xbbcc)return;const _0xddee=_0xbbcc['split']('\t');if(_0xddee['length']>=0x2){_0x7788['push']({'key':_0xddee[0x0]['trim'](),'value':_0xddee[0x1]['trim']()});}else{const _0x1100=_0xbbcc['indexOf']('\x20');if(_0x1100!==-0x1){_0x7788['push']({'key':_0xbbcc['substring'](0x0,_0x1100)['trim'](),'value':_0xbbcc['substring'](_0x1100+0x1)['trim']()});}}});return _0x7788;}function generateTable(){if(!window['isServerVerified']||!navigator['onLine']){alert('⛔\x20Access\x20Denied:\x20ต้องเชื่อมต่อ\x20Server\x20และ\x20Internet\x20เพื่อใช้งาน');return;}const _0x1a=document['getElementById']('thaiInput')['value'];const _0x2b=document['getElementById']('engInput')['value'];const _0x3c=[...parseData(_0x1a),...parseData(_0x2b)];const _0x4d=new Map();_0x3c['forEach'](_0x5e=>{if(!_0x4d['has'](_0x5e['key'])){_0x4d['set'](_0x5e['key'],{'eng':'','thai':''});}const _0x6f=_0x4d['get'](_0x5e['key']);if(isThaiText(_0x5e['value'])){_0x6f['thai']=_0x5e['value'];}else{if(!_0x6f['eng'])_0x6f['eng']=_0x5e['value'];else if(!_0x6f['thai'])_0x6f['thai']=_0x5e['value'];}});const _0x7g=document['getElementById']('mainTbody');_0x7g['innerHTML']='';_0x4d['forEach']((_0x8h,_0x9i)=>{appendRowToMainTable(_0x9i,_0x8h['eng'],_0x8h['thai']);});}function appendRowToMainTable(_0x1k,_0x2l,_0x3m){const _0x4n=document['getElementById']('mainTbody');const _0x5o=document['createElement']('tr');_0x5o['innerHTML']=`<td><input type="text" value="${escapeHtml(_0x1k)}" class="row-key"></td><td><input type="text" value="${escapeHtml(_0x2l)}" class="row-eng"></td><td><input type="text" value="${escapeHtml(_0x3m)}" class="row-thai"></td><td style="text-align: center;"><button class="btn-danger" style="padding:4px 8px;" onclick="this.closest('tr').remove()">✕</button></td>`;_0x4n['appendChild'](_0x5o);}function handleSearch(){if(!window['isServerVerified']||!navigator['onLine']){return;}const _0x1a=document['getElementById']('searchInput')['value']['toLowerCase']()['trim']();const _0x2b=document['getElementById']('searchResults');if(!_0x1a){_0x2b['style']['display']='none';return;}const _0x3c=[];for(const _0x4d of globalCdnMap['values']()){if(_0x4d['key']['toLowerCase']()['includes'](_0x1a)||_0x4d['eng']['toLowerCase']()['includes'](_0x1a)||_0x4d['thai']['toLowerCase']()['includes'](_0x1a)){_0x3c['push'](_0x4d);}if(_0x3c['length']>=0x19)break;}if(_0x3c['length']>0x0){_0x2b['innerHTML']=_0x3c['map'](_0x5e=>`<div class="search-item" onclick="selectSearchItem('${escapeHtml(_0x5e['key'])}')"><div class="item-key">${_0x5e['key']}</div><div class="item-val">🇬🇧 ${_0x5e['eng']||'-'} | 🇹🇭 ${_0x5e['content']||_0x5e['thai']||'-'}</div></div>`)['join']('');_0x2b['style']['display']='block';}else{_0x2b['innerHTML']='<div class="search-item" style="color:#999;">ไม่พบข้อมูล</div>';_0x2b['style']['display']='block';}}function selectSearchItem(_0x1x){const _0x2y=globalCdnMap['get'](_0x1x);if(_0x2y){appendRowToMainTable(_0x2y['key'],_0x2y['eng'],_0y=>_0x2y['thai']);}document['getElementById']('searchResults')['style']['display']='none';document['getElementById']('searchInput')['value']='';}function copyResult(){const _0x11=document['querySelectorAll']('#mainTbody tr');if(_0x11['length']===0x0){alert('ไม่มีข้อมูลให้ Copy');return;}let _0x22='';_0x11['forEach'](_0x33=>{_0x22+=`${_0x33['querySelector']('.row-key')['value']}\t${_0x33['querySelector']('.row-eng')['value']}\t${_0x33['querySelector']('.row-thai')['value']}\n`;});navigator['clipboard']['writeText'](_0x22)['then'](()=>{alert('📋 คัดลอกข้อมูลเรียบร้อยแล้ว!');});}async function clearHistory(){if(!confirm('ล้างประวัติทั้งหมด?'))return;if(typeof window['checkAdminStatus']==='function'){const _0x1a=await window['checkAdminStatus']();if(!_0x1a){alert('⛔ สำหรับ Admin เท่านั้น');return;}document['getElementById']('mainTbody')['innerHTML']='';alert('🗑️ ล้างข้อมูลเรียบร้อยแล้ว');}}function escapeHtml(_0x11){return String(_0x11||'')['replace'](/&/g,'&amp;')['replace'](/</g,'&lt;')['replace']/>/g,'&gt;')['replace'](/"/g,'&quot;')['replace'](/'/g,'&#039;');}
 </script>
+</body>
+</html>
