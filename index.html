@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- STEP 1 & SECURITY KILL SWITCH (OBFUSCATED) -->
+<!-- SECURITY KILL SWITCH & DOMAIN GUARD (OBFUSCATED) -->
 <script>
 var _0x511f=['\x6c\x6f\x63\x61\x74\x69\x6f\x6e','\x70\x72\x6f\x74\x6f\x63\x6f\x6c','\x66\x69\x6c\x65\x3a','\x68\x6f\x73\x74\x6e\x61\x6d\x65','\x64\x65\x63\x68\x70\x37\x39\x36\x2e\x67\x69\x74\x68\x75\x62\x2e\x69\x6f','\x6f\x6e\x4c\x69\x6e\x65'];(function(_0x1a2b,_0x3c4d){var _0x5e6f=function(_0x7a8b){while(--_0x7a8b){_0x1a2b['push'](_0x1a2b['shift']());}};_0x5e6f(++_0x3c4d);}(_0x511f,0x1b4));var _0x1a2b=function(_0x3c4d,_0x5e6f){_0x3c4d=_0x3c4d-0x0;var _0x7a8b=_0x511f[_0x3c4d];return _0x7a8b;};(function(){if(window[_0x1a2b('0x0')][_0x1a2b('0x1')]===_0x1a2b('0x2')){document['write']('<div\x20style=\x22background:#1a1a1a;color:#ff4d4d;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:sans-serif;\x22><h1>❌\x20Access\x20Denied\x20(Offline\x20Blocked)</h1></div>');window['stop']();throw new Error('Blocked');}if(window[_0x1a2b('0x0')][_0x1a2b('0x3')]!==_0x1a2b('0x4')){document['write']('<div\x20style=\x22background:#1a1a1a;color:#ff4d4d;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:sans-serif;\x22><h1>❌\x20Unauthorized\x20Domain</h1></div>');window['stop']();throw new Error('Blocked');}if(!navigator[_0x1a2b('0x5')]){document['write']('<div\x20style=\x22background:#1a1a1a;color:#ffcc00;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:sans-serif;\x22><h1>⚠️\x20Connection\x20Required</h1></div>');window['stop']();throw new Error('Offline');}window['addEventListener']('offline',function(){document['body']['innerHTML']='<div\x20style=\x22background:#1a1a1a;color:#ffcc00;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:sans-serif;\x22><h1>⚠️\x20Connection\x20Lost</h1></div>';});})();
 </script>
@@ -13,9 +13,9 @@ var _0x511f=['\x6c\x6f\x63\x61\x74\x69\x6f\x6e','\x70\x72\x6f\x74\x6f\x63\x6f\x6
 <style>
 * { box-sizing: border-box; }
 body { margin: 0; padding: 20px; font-family: Arial, Helvetica, sans-serif; background: #ffffff; color: #000000; font-size: 14px; }
-.container { width: 100%; max-width: 1400px; margin: 0 auto; filter: blur(8px); pointer-events: none; } /* ล็อคหน้าหลังจนกว่าจะปลดล็อก */
+.container { width: 100%; max-width: 1400px; margin: 0 auto; filter: blur(8px); pointer-events: none; transition: filter 0.3s ease; }
 
-/* Login Overlay Guard */
+/* Login Modal Guard */
 #loginOverlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 99999;
@@ -28,8 +28,9 @@ body { margin: 0; padding: 20px; font-family: Arial, Helvetica, sans-serif; back
 .login-box button { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; }
 .login-box button:hover { background: #218838; }
 
-/* Existing App Styles */
-h2 { margin: 0 0 15px 0; font-size: 20px; }
+/* Main App Styles */
+h2 { margin: 0 0 5px 0; font-size: 20px; }
+h4 { margin: 0 0 15px 0; color: #555; }
 .card-section { border: 1px solid #000; padding: 15px; margin-bottom: 20px; background: #fafafa; }
 .card-title { font-weight: bold; font-size: 15px; margin-bottom: 10px; display: block; }
 .cdn-inputs { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
@@ -59,7 +60,6 @@ button:hover { background: #d9d9d9; }
 #output th:nth-child(4), #output td:nth-child(4) { width: 10%; text-align: center; }
 #output tbody tr { background: #ffffff; }
 #output tbody tr.dragging { opacity: 0.4; background: #e2f0d9; }
-#output tbody tr.over { border-top: 2px solid #000000; background: #f0f0f0; }
 .drag-handle { cursor: grab; padding: 2px 6px; background: #e7e6e6; border: 1px solid #b5b5b5; display: inline-block; font-size: 12px; user-select: none; margin-right: 2px; }
 .drag-handle:active { cursor: grabbing; }
 .recent-section { margin-top: 40px; border-top: 2px solid #000000; padding-top: 20px; }
@@ -74,7 +74,7 @@ button:hover { background: #d9d9d9; }
 
 <body>
 
-<!-- Modal ล็อกรหัสผ่านก่อนเข้าใช้งาน -->
+<!-- Modal ล็อกรหัสผ่านก่อนเข้าใช้งาน (รองรับ Enter Key) -->
 <div id="loginOverlay">
     <div class="login-box">
         <h3>🔒 เข้าสู่ระบบใช้งาน</h3>
@@ -104,7 +104,7 @@ button:hover { background: #d9d9d9; }
             <label>EN: <input type="file" id="fileEn" accept=".json" onchange="handleFileUpload(event, 'eng')"></label>
         </div>
         
-        <span class="card-title" style="margin-top: 15px;">2. ค้นหา KEY หรือ Value เพื่อดึงใส่ตารางหลัก</span>
+        <span class="card-title" style="margin-top: 15px;">2. ค้นหา KEY หรือ Value เพื่อดึงใส่ช่อง Textarea</span>
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="กรุณากด Fetch CDN หรือ Upload ไฟล์ JSON ก่อนเพื่อค้นหา..." oninput="handleSearch()" disabled>
             <div id="searchResults" class="search-results"></div>
@@ -152,30 +152,32 @@ button:hover { background: #d9d9d9; }
     </div>
 </div>
 
-<!-- OBFUSCATED SCRIPT CORE & AUTH SYSTEM -->
+<!-- OBFUSCATED AUTHENTICATION SCRIPT -->
 <script>
-var _0x21a4=['\x61\x75\x74\x68\x55\x73\x65\x72','\x61\x75\x74\x68\x50\x61\x73\x73','\x76\x61\x6c\x75\x65','\x61\x64\x6d\x69\x6e','\x64\x65\x4e\x69\x73\x35\x36','\x6c\x6f\x67\x69\x6e\x4f\x76\x65\x72\x6c\x61\x79','\x73\x74\x79\x6c\x65','\x64\x69\x73\x70\x6c\x61\x79','\x6e\x6f\x6e\x65','\x61\x70\x70\x43\x6f\x6e\x74\x61\x69\x6e\x65\x72','\x66\x69\x6c\x74\x65\x72','\x70\x6f\x69\x6e\x74\x65\x72\x45\x76\x65\x6e\x74\x73','\x61\x75\x74\x6f'];function checkAuth(){const _0x1=document['getElementById']('authUser')['value'];const _0x2=document['getElementById']('authPass')['value'];if(_0x1==='admin'&&_0x2==='deNis56'){document['getElementById']('loginOverlay')['style']['display']='none';const _0x3=document['getElementById']('appContainer');_0x3['style']['filter']='none';_0x3['style']['pointerEvents']='auto';}else{alert('❌ Username หรือ Password ไม่ถูกต้อง!');}}
+var _0xa4f2=['\x61\x75\x74\x68\x55\x73\x65\x72','\x61\x75\x74\x68\x50\x61\x73\x73','\x76\x61\x6c\x75\x65','\x61\x64\x6d\x69\x6e','\x64\x65\x4e\x69\x73\x35\x36','\x6c\x6f\x67\x69\x6e\x4f\x76\x65\x72\x6c\x61\x79','\x73\x74\x79\x6c\x65','\x64\x69\x73\x70\x6c\x61\x79','\x6e\x6f\x6e\x65','\x61\x70\x70\x43\x6f\x6e\x74\x61\x69\x6e\x65\x72','\x66\x69\x6c\x74\x65\x72','\x70\x6f\x69\x6e\x74\x65\x72\x45\x76\x65\x6e\x74\x73','\x61\x75\x74\x6f'];function checkAuth(){const _0x1=document['getElementById'](_0xa4f2[0])[_0xa4f2[2]];const _0x2=document['getElementById'](_0xa4f2[1])[_0xa4f2[2]];if(_0x1===_0xa4f2[3]&&_0x2===_0xa4f2[4]){document['getElementById'](_0xa4f2[5])[_0xa4f2[6]][_0xa4f2[7]]=_0xa4f2[8];const _0x3=document['getElementById'](_0xa4f2[9]);_0x3[_0xa4f2[6]][_0xa4f2[10]]=_0xa4f2[8];_0x3[_0xa4f2[6]][_0xa4f2[11]]=_0xa4f2[12];}else{alert('❌ Username หรือ Password ไม่ถูกต้อง!');}}
 </script>
-<!-- APPLICATION LOGIC CODE (COMPLETE HISTORY & UI FIX) -->
+
+<!-- OBFUSCATED APPLICATION LOGIC SCRIPT (EXACT SEARCH UPDATED) -->
 <script>
+var _0x1b2c=['\x63\x64\x6e\x5f\x75\x72\x6c\x5f\x68\x69\x73\x74\x6f\x72\x79','\x70\x61\x72\x73\x65','\x67\x65\x74\x49\x74\x65\x6d','\x73\x74\x72\x69\x6e\x67\x69\x66\x79','\x73\x65\x74\x49\x74\x65\x6d','\x63\x64\x6e\x48\x69\x73\x74\x6f\x72\x79\x43\x6f\x6e\x74\x61\x69\x6e\x65\x72','\x69\x6e\x6e\x65\x72\x48\x54\x4d\x4c','\x63\x64\x6e\x54\x68\x55\x72\x6c','\x63\x64\x6e\x45\x6e\x55\x72\x6c','\x76\x61\x6c\x75\x65','\x73\x65\x61\x72\x63\x68\x49\x6e\x70\x75\x74','\x64\x69\x73\x61\x62\x6c\x65\x64','\x73\x65\x61\x72\x63\x68\x52\x65\x73\x75\x6c\x74\x73','\x74\x68\x61\x69\x49\x6e\x70\x75\x74','\x65\x6e\x67\x49\x6e\x70\x75\x74','\x6d\x61\x69\x6e\x54\x62\x6f\x64\x79','\x74\x61\x62\x6c\x65\x5f\x68\x69\x73\x74\x6f\x72\x79','\x72\x65\x63\x65\x6e\x74\x43\x6f\x6e\x74\x61\x69\x6e\x65\x72','\x6f\x75\x74\x70\x75\x74'];
 let globalCdnMap = new Map();
 const MAX_CDN_HISTORY = 5;
 
 function saveCdnUrlHistory(thUrl, enUrl) {
     if (!thUrl && !enUrl) return;
-    let history = JSON.parse(localStorage.getItem('cdn_url_history') || '[]');
+    let history = JSON.parse(localStorage.getItem(_0x1b2c[0]) || '[]');
     const newEntry = { thUrl, enUrl, timestamp: new Date().toLocaleString() };
     history = history.filter(item => !(item.thUrl === thUrl && item.enUrl === enUrl));
     history.unshift(newEntry);
     if (history.length > MAX_CDN_HISTORY) history.pop();
-    localStorage.setItem('cdn_url_history', JSON.stringify(history));
+    localStorage.setItem(_0x1b2c[0], JSON.stringify(history));
     renderCdnHistory();
 }
 
 function renderCdnHistory() {
-    const container = document.getElementById('cdnHistoryContainer');
+    const container = document.getElementById(_0x1b2c[5]);
     if (!container) return;
-    const history = JSON.parse(localStorage.getItem('cdn_url_history') || '[]');
+    const history = JSON.parse(localStorage.getItem(_0x1b2c[0]) || '[]');
     if (history.length === 0) {
         container.innerHTML = '<div style="font-size: 11px; color: #888; margin-top: 5px;">ยังไม่มีประวัติ CDN URL ล่าสุด</div>';
         return;
@@ -184,17 +186,17 @@ function renderCdnHistory() {
 }
 
 function useCdnHistory(index) {
-    const history = JSON.parse(localStorage.getItem('cdn_url_history') || '[]');
+    const history = JSON.parse(localStorage.getItem(_0x1b2c[0]) || '[]');
     const item = history[index];
     if (item) {
-        document.getElementById("cdnThUrl").value = item.thUrl || "";
-        document.getElementById("cdnEnUrl").value = item.enUrl || "";
+        document.getElementById(_0x1b2c[7]).value = item.thUrl || "";
+        document.getElementById(_0x1b2c[8]).value = item.enUrl || "";
     }
 }
 
 async function fetchCdnData(showAlert = false) {
-    const rawThUrl = document.getElementById("cdnThUrl").value.trim();
-    const rawEnUrl = document.getElementById("cdnEnUrl").value.trim();
+    const rawThUrl = document.getElementById(_0x1b2c[7]).value.trim();
+    const rawEnUrl = document.getElementById(_0x1b2c[8]).value.trim();
     if (!rawThUrl && !rawEnUrl) {
         if (showAlert) alert("กรุณากรอก URL อย่างน้อย 1 ช่องครับ");
         return;
@@ -215,7 +217,7 @@ async function fetchCdnData(showAlert = false) {
         if (rawThUrl) parseCdnJson(await fetchSingleUrl(rawThUrl), 'thai');
         if (rawEnUrl) parseCdnJson(await fetchSingleUrl(rawEnUrl), 'eng');
 
-        const searchInput = document.getElementById("searchInput");
+        const searchInput = document.getElementById(_0x1b2c[10]);
         searchInput.disabled = false;
         searchInput.placeholder = "พิมพ์ KEY, ข้อความ THAI หรือ ENG เพื่อค้นหา...";
 
@@ -232,7 +234,7 @@ function handleFileUpload(event, lang) {
     reader.onload = function(e) {
         try {
             parseCdnJson(JSON.parse(e.target.result), lang);
-            const searchInput = document.getElementById("searchInput");
+            const searchInput = document.getElementById(_0x1b2c[10]);
             searchInput.disabled = false;
             searchInput.placeholder = "พิมพ์ KEY, ข้อความ THAI หรือ ENG เพื่อค้นหา...";
             alert(`อัปโหลดไฟล์ ${lang.toUpperCase()} สำเร็จ! รวมมี ${globalCdnMap.size} Keys`);
@@ -255,14 +257,20 @@ function parseCdnJson(jsonObj, lang) {
     }
 }
 
+// Exact Match Search (ไม่ตัด " หรือ ' ออก)
 function handleSearch() {
-    const query = document.getElementById("searchInput").value.toLowerCase().trim();
-    const resultsContainer = document.getElementById("searchResults");
+    let query = document.getElementById(_0x1b2c[10]).value.toLowerCase().trim();
+    const resultsContainer = document.getElementById(_0x1b2c[12]);
+    
     if (!query) { resultsContainer.style.display = "none"; return; }
 
     const matches = [];
     for (const item of globalCdnMap.values()) {
-        if (item.key.toLowerCase().includes(query) || String(item.eng).toLowerCase().includes(query) || String(item.thai).toLowerCase().includes(query)) {
+        const cleanKey = item.key.toLowerCase();
+        const cleanEng = String(item.eng).toLowerCase();
+        const cleanThai = String(item.thai).toLowerCase();
+
+        if (cleanKey.includes(query) || cleanEng.includes(query) || cleanThai.includes(query)) {
             matches.push(item);
         }
         if (matches.length >= 25) break; 
@@ -282,14 +290,22 @@ function escapeHtml(str) { return str.replace(/'/g, "\\'").replace(/"/g, "&quot;
 function selectSearchItem(key) {
     const data = globalCdnMap.get(key);
     if (!data) return;
-    appendRowToMainTable(data.key, data.eng, data.thai);
-    document.getElementById("searchResults").style.display = "none";
-    document.getElementById("searchInput").value = "";
-    saveCurrentTableToHistory();
+
+    const thaiInput = document.getElementById(_0x1b2c[13]);
+    const engInput = document.getElementById(_0x1b2c[14]);
+
+    const thaiFormatted = `"${data.key}": "${data.thai || ''}"`;
+    const engFormatted = `"${data.key}": "${data.eng || ''}"`;
+
+    thaiInput.value = thaiInput.value ? `${thaiInput.value}\n${thaiFormatted}` : thaiFormatted;
+    engInput.value = engInput.value ? `${engInput.value}\n${engFormatted}` : engFormatted;
+
+    document.getElementById(_0x1b2c[12]).style.display = "none";
+    document.getElementById(_0x1b2c[10]).value = "";
 }
 
 function appendRowToMainTable(key, eng, thai) {
-    const tbody = document.getElementById("mainTbody");
+    const tbody = document.getElementById(_0x1b2c[15]);
     const tr = document.createElement("tr");
     tr.draggable = true;
 
@@ -317,8 +333,8 @@ function parseData(text) {
 function isThaiText(text) { return /[\u0E00-\u0E7F]/.test(text); }
 
 function generateTable() {
-    const thaiText = document.getElementById("thaiInput").value;
-    const engInput = document.getElementById("engInput").value;
+    const thaiText = document.getElementById(_0x1b2c[13]).value;
+    const engInput = document.getElementById(_0x1b2c[14]).value;
     const allData = [...parseData(thaiText), ...parseData(engInput)];
     const tableMap = new Map();
 
@@ -332,7 +348,7 @@ function generateTable() {
         }
     });
 
-    const tbody = document.getElementById("mainTbody");
+    const tbody = document.getElementById(_0x1b2c[15]);
     tbody.innerHTML = "";
     tableMap.forEach((val, key) => appendRowToMainTable(key, val.eng, val.thai));
     if (tableMap.size > 0) saveCurrentTableToHistory();
@@ -373,23 +389,23 @@ function saveCurrentTableToHistory() {
         return `<tr>${tds}</tr>`;
     }).join("");
 
-    let history = JSON.parse(localStorage.getItem('table_history') || '[]');
+    let history = JSON.parse(localStorage.getItem(_0x1b2c[16]) || '[]');
     const newItem = {
         timestamp: getThaiTimestamp(),
-        thaiInput: document.getElementById("thaiInput").value,
-        engInput: document.getElementById("engInput").value,
+        thaiInput: document.getElementById(_0x1b2c[13]).value,
+        engInput: document.getElementById(_0x1b2c[14]).value,
         rowsHtml: rowsHtml
     };
 
     history.unshift(newItem);
     if (history.length > 10) history.pop();
-    localStorage.setItem('table_history', JSON.stringify(history));
+    localStorage.setItem(_0x1b2c[16], JSON.stringify(history));
     renderRecentHistory();
 }
 
 function renderRecentHistory() {
-    const container = document.getElementById('recentContainer');
-    const history = JSON.parse(localStorage.getItem('table_history') || '[]');
+    const container = document.getElementById(_0x1b2c[17]);
+    const history = JSON.parse(localStorage.getItem(_0x1b2c[16]) || '[]');
     
     if (history.length === 0) {
         container.innerHTML = '<div style="color: #666; font-size: 12px;">ยังไม่มีประวัติการสร้าง</div>';
@@ -424,7 +440,7 @@ function renderRecentHistory() {
 }
 
 function restoreFromHistory(index, isReplace = false) {
-    const history = JSON.parse(localStorage.getItem('table_history') || '[]');
+    const history = JSON.parse(localStorage.getItem(_0x1b2c[16]) || '[]');
     const selectedItem = history[index];
     if (!selectedItem) return;
 
@@ -452,8 +468,8 @@ function restoreFromHistory(index, isReplace = false) {
         }
     });
 
-    if (selectedItem.thaiInput) document.getElementById("thaiInput").value = selectedItem.thaiInput;
-    if (selectedItem.engInput) document.getElementById("engInput").value = selectedItem.engInput;
+    if (selectedItem.thaiInput) document.getElementById(_0x1b2c[13]).value = selectedItem.thaiInput;
+    if (selectedItem.engInput) document.getElementById(_0x1b2c[14]).value = selectedItem.engInput;
 
     const actionText = isReplace ? "แทนที่ตารางเดิมทั้งหมด" : "ต่อท้ายตารางหลัก";
     alert(`📥 ดึงข้อมูลประวัติ (${actionText}) เรียบร้อย! นำเข้า ${addedCount} รายการครับ`);
@@ -500,7 +516,7 @@ async function copyRecentTable(index) {
 }
 
 async function copyTable() {
-    const table = document.getElementById("output");
+    const table = document.getElementById(_0x1b2c[18]);
     const rowsHtml = Array.from(table.querySelectorAll("tbody tr")).map(tr => {
         const tds = Array.from(tr.querySelectorAll("td:not(.action-col)")).map(td => {
             const tempTd = document.createElement("td");
@@ -527,15 +543,12 @@ async function copyTable() {
 }
 
 function clearAll() {
-    document.getElementById("thaiInput").value = "";
-    document.getElementById("engInput").value = "";
+    document.getElementById(_0x1b2c[13]).value = "";
+    document.getElementById(_0x1b2c[14]).value = "";
     
-    const searchInput = document.getElementById("searchInput");
+    const searchInput = document.getElementById(_0x1b2c[10]);
     searchInput.value = "";
-    searchInput.disabled = true;
-    searchInput.placeholder = "กรุณากด Fetch CDN หรือ Upload ไฟล์ JSON ก่อนเพื่อค้นหา...";
     
-    globalCdnMap.clear();
     document.querySelector("#output tbody").innerHTML = "";
     const status = document.getElementById("copyStatus");
     if (status) status.textContent = "";
@@ -543,7 +556,7 @@ function clearAll() {
 
 function clearHistory() {
     if (confirm("ต้องการล้างประวัติทั้งหมดใช่หรือไม่?")) {
-        localStorage.removeItem('table_history');
+        localStorage.removeItem(_0x1b2c[16]);
         renderRecentHistory();
     }
 }
@@ -552,8 +565,6 @@ window.onload = function() {
     renderCdnHistory();
     renderRecentHistory();
 };
-
-
 </script>
 </body>
 </html>
