@@ -157,7 +157,7 @@ button:hover { background: #d9d9d9; }
 var _0xa4f2=['\x61\x75\x74\x68\x55\x73\x65\x72','\x61\x75\x74\x68\x50\x61\x73\x73','\x76\x61\x6c\x75\x65','\x61\x64\x6d\x69\x6e','\x64\x65\x4e\x69\x73\x35\x36','\x6c\x6f\x67\x69\x6e\x4f\x76\x65\x72\x6c\x61\x79','\x73\x74\x79\x6c\x65','\x64\x69\x73\x70\x6c\x61\x79','\x6e\x6f\x6e\x65','\x61\x70\x70\x43\x6f\x6e\x74\x61\x69\x6e\x65\x72','\x66\x69\x6c\x74\x65\x72','\x70\x6f\x69\x6e\x74\x65\x72\x45\x76\x65\x6e\x74\x73','\x61\x75\x74\x6f'];function checkAuth(){const _0x1=document['getElementById'](_0xa4f2[0])[_0xa4f2[2]];const _0x2=document['getElementById'](_0xa4f2[1])[_0xa4f2[2]];if(_0x1===_0xa4f2[3]&&_0x2===_0xa4f2[4]){document['getElementById'](_0xa4f2[5])[_0xa4f2[6]][_0xa4f2[7]]=_0xa4f2[8];const _0x3=document['getElementById'](_0xa4f2[9]);_0x3[_0xa4f2[6]][_0xa4f2[10]]=_0xa4f2[8];_0x3[_0xa4f2[6]][_0xa4f2[11]]=_0xa4f2[12];}else{alert('❌ Username หรือ Password ไม่ถูกต้อง!');}}
 </script>
 
-<!-- OBFUSCATED APPLICATION LOGIC SCRIPT (EXACT SEARCH UPDATED) -->
+<!-- OBFUSCATED APPLICATION LOGIC SCRIPT (SMART SEARCH & EN LABEL FIXED) -->
 <script>
 var _0x1b2c=['\x63\x64\x6e\x5f\x75\x72\x6c\x5f\x68\x69\x73\x74\x6f\x72\x79','\x70\x61\x72\x73\x65','\x67\x65\x74\x49\x74\x65\x6d','\x73\x74\x72\x69\x6e\x67\x69\x66\x79','\x73\x65\x74\x49\x74\x65\x6d','\x63\x64\x6e\x48\x69\x73\x74\x6f\x72\x79\x43\x6f\x6e\x74\x61\x69\x6e\x65\x72','\x69\x6e\x6e\x65\x72\x48\x54\x4d\x4c','\x63\x64\x6e\x54\x68\x55\x72\x6c','\x63\x64\x6e\x45\x6e\x55\x72\x6c','\x76\x61\x6c\x75\x65','\x73\x65\x61\x72\x63\x68\x49\x6e\x70\x75\x74','\x64\x69\x73\x61\x62\x6c\x65\x64','\x73\x65\x61\x72\x63\x68\x52\x65\x73\x75\x6c\x74\x73','\x74\x68\x61\x69\x49\x6e\x70\x75\x74','\x65\x6e\x67\x49\x6e\x70\x75\x74','\x6d\x61\x69\x6e\x54\x62\x6f\x64\x79','\x74\x61\x62\x6c\x65\x5f\x68\x69\x73\x74\x6f\x72\x79','\x72\x65\x63\x65\x6e\x74\x43\x6f\x6e\x74\x61\x69\x6e\x65\x72','\x6f\x75\x74\x70\x75\x74'];
 let globalCdnMap = new Map();
@@ -257,9 +257,10 @@ function parseCdnJson(jsonObj, lang) {
     }
 }
 
-// Exact Match Search (ไม่ตัด " หรือ ' ออก)
+// SMART SEARCH (ลบ " และ ' ออกจากคำค้นหา เพื่อให้ Match เท่ากับ Ctrl+F)
 function handleSearch() {
-    let query = document.getElementById(_0x1b2c[10]).value.toLowerCase().trim();
+    let rawQuery = document.getElementById(_0x1b2c[10]).value;
+    const query = rawQuery.replace(/["']/g, "").toLowerCase().trim();
     const resultsContainer = document.getElementById(_0x1b2c[12]);
     
     if (!query) { resultsContainer.style.display = "none"; return; }
@@ -273,11 +274,12 @@ function handleSearch() {
         if (cleanKey.includes(query) || cleanEng.includes(query) || cleanThai.includes(query)) {
             matches.push(item);
         }
-        if (matches.length >= 25) break; 
+        if (matches.length >= 50) break; 
     }
 
     if (matches.length > 0) {
-        resultsContainer.innerHTML = matches.map(m => `<div class="search-item" onclick="selectSearchItem('${escapeHtml(m.key)}')"><div class="item-key">${m.key}</div><div class="item-val">🇬🇧 ${m.eng || '-'} | 🇹🇭 ${m.thai || '-'}</div></div>`).join('');
+        // เปลี่ยนไอคอน GB เป็น EN ชัดเจน
+        resultsContainer.innerHTML = matches.map(m => `<div class="search-item" onclick="selectSearchItem('${escapeHtml(m.key)}')"><div class="item-key">${m.key}</div><div class="item-val"><b>EN:</b> ${m.eng || '-'} | <b>TH:</b> ${m.thai || '-'}</div></div>`).join('');
         resultsContainer.style.display = "block";
     } else {
         resultsContainer.innerHTML = `<div class="search-item" style="color: #999;">ไม่พบข้อมูลที่ตรงกัน</div>`;
